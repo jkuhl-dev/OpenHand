@@ -17,7 +17,7 @@ import org.json.JSONObject
  * @property nozzleTargetTemperature Double that describes the target nozzle temperature
  * @property printName String containing the name of the active print
  * @property printProgress Integer from 0 to 100 that describes the progress of the active print
- * @property printTimeRemaining Integer that describes the number of minutes remaining on the active print
+ * @property printTimeRemainingMinutes Integer that describes the number of minutes remaining on the active print
  * @property printerSerial String containing the serial number of the printer
  */
 data class PrinterStatus(
@@ -34,7 +34,7 @@ data class PrinterStatus(
     val nozzleTargetTemperature: Double? = null,
     val printName: String? = null,
     val printProgress: Int? = null,
-    val printTimeRemaining: Int? = null,
+    val printTimeRemainingMinutes: Int? = null,
     val printerSerial: String? = null,
 ) {
     companion object {
@@ -75,7 +75,7 @@ data class PrinterStatus(
                     .takeIf { it.isNotBlank() },
                 printProgress = p.optInt("mc_percent", -1)
                     .takeIf { it >= 0 },
-                printTimeRemaining = p.optInt("mc_remaining_time", -1)
+                printTimeRemainingMinutes = p.optInt("mc_remaining_time", -1)
                     .takeIf { it >= 0 },
                 printerSerial = p.optJSONObject("upgrade_state")?.optString("sn")
                     ?.takeIf { it.isNotBlank() }
@@ -98,6 +98,6 @@ val PREVIEW_PRINTER_STATUS = PrinterStatus(
     nozzleTargetTemperature = 220.0,
     printName = "Preview",
     printProgress = 20,
-    printTimeRemaining = 117,
+    printTimeRemainingMinutes = 117,
     printerSerial = "000000000000000"
 )

@@ -11,4 +11,4 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class Printer(val name: String, val ipAddress: String, val accessCode: String)
 
-val PREVIEW_PRINTERS = (1..10).map { Printer("Printer $it", "192.168.1.$it", "abcd1234") }
+val PREVIEW_PRINTER = Printer("Preview", "192.168.1.100", "00000000")

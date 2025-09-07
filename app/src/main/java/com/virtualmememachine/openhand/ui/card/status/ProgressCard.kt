@@ -1,4 +1,4 @@
-package com.virtualmememachine.openhand.ui.cards.status
+package com.virtualmememachine.openhand.ui.card.status
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -44,7 +44,7 @@ fun ProgressCard(status: PrinterStatus) {
             }
             Text(text = "Name: ${status.printName ?: "N/A"}")
             Text(text = "Layer: ${status.layerCurrent ?: "N/A"} / ${status.layerTotal ?: "N/A"}")
-            Text(text = "Time Remaining: ${getTimeRemainingString(status.printTimeRemaining)}")
+            Text(text = "Time Remaining: ${getTimeRemainingString(status.printTimeRemainingMinutes)}")
             LinearProgressIndicator(
                 progress = { (status.printProgress ?: 0) / 100f },
                 gapSize = (-100).dp,

@@ -1,4 +1,4 @@
-package com.virtualmememachine.openhand.ui.cards.status
+package com.virtualmememachine.openhand.ui.card.status
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -21,7 +21,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.virtualmememachine.openhand.data.ConnectionState
-import com.virtualmememachine.openhand.data.PREVIEW_PRINTERS
+import com.virtualmememachine.openhand.data.PREVIEW_PRINTER
 import com.virtualmememachine.openhand.data.PREVIEW_PRINTER_STATUS
 import com.virtualmememachine.openhand.data.Printer
 import com.virtualmememachine.openhand.data.PrinterStatus
@@ -98,7 +98,7 @@ private fun getLastUpdatedString(lastUpdatedMillis: Long?): String {
 private fun ConnectionCardPreview() {
     OpenHandTheme {
         ConnectionCard(
-            printer = PREVIEW_PRINTERS.first(),
+            printer = PREVIEW_PRINTER,
             status = PREVIEW_PRINTER_STATUS
         )
     }

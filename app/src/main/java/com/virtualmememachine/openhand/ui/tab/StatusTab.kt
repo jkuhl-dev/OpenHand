@@ -14,19 +14,20 @@ import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.virtualmememachine.openhand.data.ConnectionState
-import com.virtualmememachine.openhand.data.PREVIEW_PRINTERS
+import com.virtualmememachine.openhand.data.PREVIEW_PRINTER
 import com.virtualmememachine.openhand.data.PREVIEW_PRINTER_STATUS
 import com.virtualmememachine.openhand.data.Printer
 import com.virtualmememachine.openhand.network.PrinterStatusClient
-import com.virtualmememachine.openhand.ui.activity.PrinterDetailScreen
-import com.virtualmememachine.openhand.ui.cards.status.ConnectionCard
-import com.virtualmememachine.openhand.ui.cards.status.ProgressCard
-import com.virtualmememachine.openhand.ui.cards.status.ThermalsCard
+import com.virtualmememachine.openhand.ui.card.status.ConnectionCard
+import com.virtualmememachine.openhand.ui.card.status.ProgressCard
+import com.virtualmememachine.openhand.ui.card.status.ThermalsCard
+import com.virtualmememachine.openhand.ui.screen.PrinterDetailScreen
 import com.virtualmememachine.openhand.ui.theme.OpenHandTheme
 
 /**
  * Tab for viewing printer status
  * @param printer Printer that is being interacted with
+ * @param isPreview Boolean that denotes if the Composable is being rendered in a preview or not
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -66,9 +67,8 @@ fun StatusTab(printer: Printer, isPreview: Boolean = LocalInspectionMode.current
 private fun StatusTabPreview() {
     OpenHandTheme {
         PrinterDetailScreen(
-            printerMapKey = PREVIEW_PRINTERS.first().ipAddress,
+            printer = PREVIEW_PRINTER,
             startTab = 0,
-            previewPrinters = PREVIEW_PRINTERS
         )
     }
 }

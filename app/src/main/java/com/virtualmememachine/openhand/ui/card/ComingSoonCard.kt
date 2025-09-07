@@ -1,4 +1,4 @@
-package com.virtualmememachine.openhand.ui.cards
+package com.virtualmememachine.openhand.ui.card
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth

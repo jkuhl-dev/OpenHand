@@ -27,17 +27,20 @@ private val IPv4Regex: Regex =
  * Dialog for adding a printer
  * @param onConfirm Callback invoked when the user completes input, returns user input as strings
  * @param onDismiss Callback invoked when the user cancels or dismisses the dialog
+ * @param initialName Prepopulated value for the Printer Name field
+ * @param initialIpAddress Prepopulated value for the IP Address field
+ * @param initialAccessCode Prepopulated value for the Access Code field
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddPrinterDialog(
     onConfirm: (printerName: String, ipAddress: String, accessCode: String) -> Unit,
     onDismiss: () -> Unit,
-    editMode: Boolean = false,
     initialName: String = "New Printer",
     initialIpAddress: String = "",
     initialAccessCode: String = "",
 ) {
+    val editMode = initialIpAddress.isNotBlank() && initialAccessCode.isNotBlank()
     var printerName by remember { mutableStateOf(initialName) }
     var ipAddress by remember { mutableStateOf(initialIpAddress) }
     var accessCode by remember { mutableStateOf(initialAccessCode) }

@@ -1,4 +1,4 @@
-package com.virtualmememachine.openhand.ui.cards.status
+package com.virtualmememachine.openhand.ui.card.status
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -37,58 +37,32 @@ fun ThermalsCard(status: PrinterStatus) {
                 horizontalArrangement = Arrangement.SpaceEvenly,
                 verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
             ) {
-                Column(
-                    modifier = Modifier.padding(8.dp),
-                    horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally
-                ) {
-                    Text(text = "Nozzle")
-                    Text(
-                        text = getTemperatureString(
-                            status.nozzleTemperature,
-                            status.nozzleTargetTemperature
-                        )
-                    )
-                }
-                Column(
-                    modifier = Modifier.padding(8.dp),
-                    horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally
-                ) {
-                    Text(text = "Bed")
-                    Text(
-                        text = getTemperatureString(
-                            status.bedTemperature,
-                            status.bedTargetTemperature
-                        )
-                    )
-                }
-                Column(
-                    modifier = Modifier.padding(8.dp),
-                    horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally
-                ) {
-                    Text(text = "Chamber")
-                    Text(
-                        text = getTemperatureString(
-                            status.chamberTemperature,
-                            status.chamberTargetTemperature
-                        )
-                    )
-                }
+                ThermalColumn("Nozzle", status.nozzleTemperature, status.nozzleTargetTemperature)
+                ThermalColumn("Bed", status.bedTemperature, status.bedTargetTemperature)
+                ThermalColumn("Chamber", status.chamberTemperature, status.chamberTargetTemperature)
             }
         }
     }
 }
 
 /**
- * Gets a nicely formatted temperature comparison string using the given input temperatures
+ * Column containing nicely formated thermal data for a single component
+ * @param label Name of the component who's thermals are displayed
  * @param inputTemperature1 The first temperature value as a Double, or null if unavailable
  * @param inputTemperature2 The second temperature value as a Double, or null if unavailable
- * @return String containing the temperatures or "-" if null
  */
-private fun getTemperatureString(inputTemperature1: Double?, inputTemperature2: Double?): String {
+@Composable
+private fun ThermalColumn(label: String, inputTemperature1: Double?, inputTemperature2: Double?) {
     val temperature1 = if (inputTemperature1 == null) "-" else "$inputTemperature1°"
     val temperature2 = if (inputTemperature2 == null) "-" else "$inputTemperature2°"
 
-    return "$temperature1 / $temperature2"
+    Column(
+        modifier = Modifier.padding(8.dp),
+        horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally
+    ) {
+        Text(text = label)
+        Text(text = "$temperature1 / $temperature2")
+    }
 }
 
 @Preview(showBackground = true)

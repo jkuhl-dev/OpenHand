@@ -1,10 +1,5 @@
-package com.virtualmememachine.openhand.ui.activity
+package com.virtualmememachine.openhand.ui.screen
 
-import android.content.Intent
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -37,11 +32,9 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.virtualmememachine.openhand.data.PREVIEW_PRINTERS
 import com.virtualmememachine.openhand.data.Printer
 import com.virtualmememachine.openhand.data.PrinterDataStore
 import com.virtualmememachine.openhand.ui.dialog.AddPrinterDialog
@@ -50,36 +43,21 @@ import com.virtualmememachine.openhand.ui.theme.OpenHandTheme
 import kotlinx.coroutines.launch
 
 /**
- * Activity for selecting or adding a printer
- */
-class PrinterListActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        setContent {
-            OpenHandTheme {
-                PrinterListScreen()
-            }
-        }
-    }
-}
-
-/**
- * Activity for selecting or adding a printer
- * @param previewPrinters List of printers to be displayed in previews
+ * Screen for selecting, adding, editing, or removing known printers
+ * @param printerDataStore Data store containing the map of known printers
+ * @param onPrinterClick Callback triggered when a printer is selected from the list
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PrinterListScreen(previewPrinters: List<Printer> = emptyList()) {
-    val context = LocalContext.current
+fun PrinterListScreen(
+    printerDataStore: PrinterDataStore = PrinterDataStore(),
+    onPrinterClick: (Printer) -> Unit = {}
+) {
     val scope = rememberCoroutineScope()
-    val printerDataStore = remember(context) { PrinterDataStore(context.applicationContext) }
-    val printersMap by printerDataStore.printersFlow.collectAsState(initial = previewPrinters.associateBy { it.ipAddress })
+    val printerMap by printerDataStore.printersFlow.collectAsState(initial = emptyMap())
     val editPrinterTarget = remember { mutableStateOf<Printer?>(null) }
     val removePrinterTarget = remember { mutableStateOf<Printer?>(null) }
     var showAddPrinterDialog by rememberSaveable { mutableStateOf(false) }
-    var showEditPrinterDialog by rememberSaveable { mutableStateOf(false) }
-    var showRemovePrinterDialog by rememberSaveable { mutableStateOf(false) }
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -101,7 +79,7 @@ fun PrinterListScreen(previewPrinters: List<Printer> = emptyList()) {
                 contentPadding = PaddingValues(vertical = 8.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                items(printersMap.values.toList()) { printer ->
+                items(printerMap.values.toList()) { printer ->
                     ListItem(
                         headlineContent = { Text(printer.name) },
                         supportingContent = { Text(printer.ipAddress) },
@@ -109,7 +87,6 @@ fun PrinterListScreen(previewPrinters: List<Printer> = emptyList()) {
                             Row {
                                 IconButton(onClick = {
                                     editPrinterTarget.value = printer
-                                    showEditPrinterDialog = true
                                 }) {
                                     Icon(
                                         imageVector = Icons.Default.Edit,
@@ -118,7 +95,6 @@ fun PrinterListScreen(previewPrinters: List<Printer> = emptyList()) {
                                 }
                                 IconButton(onClick = {
                                     removePrinterTarget.value = printer
-                                    showRemovePrinterDialog = true
                                 }) {
                                     Icon(
                                         imageVector = Icons.Default.Delete,
@@ -128,14 +104,7 @@ fun PrinterListScreen(previewPrinters: List<Printer> = emptyList()) {
                             }
                         },
                         modifier = Modifier
-                            .clickable {
-                                val intent = Intent(context, PrinterDetailActivity::class.java)
-                                intent.putExtra(
-                                    PrinterDetailActivity.PRINTER_MAP_KEY,
-                                    printer.ipAddress
-                                )
-                                context.startActivity(intent)
-                            }
+                            .clickable { onPrinterClick(printer) }
                             .padding(horizontal = 8.dp)
                     )
                 }
@@ -162,40 +131,35 @@ fun PrinterListScreen(previewPrinters: List<Printer> = emptyList()) {
             )
         }
 
-        if (showEditPrinterDialog) {
-            val target = editPrinterTarget.value
-            if (target != null) {
-                AddPrinterDialog(
-                    onConfirm = { printerName: String, ipAddress: String, accessCode: String ->
-                        scope.launch {
-                            // If the IP changed remove the old entry to prevent duplicates
-                            if (ipAddress != target.ipAddress) {
-                                printerDataStore.removePrinter(target)
-                            }
-                            printerDataStore.addOrUpdatePrinter(
-                                Printer(
-                                    name = printerName,
-                                    ipAddress = ipAddress,
-                                    accessCode = accessCode
-                                )
-                            )
+        if (editPrinterTarget.value != null) {
+            val target = editPrinterTarget.value ?: return@Scaffold
+            AddPrinterDialog(
+                onConfirm = { printerName: String, ipAddress: String, accessCode: String ->
+                    scope.launch {
+                        // If the IP changed remove the old entry to prevent duplicates
+                        if (ipAddress != target.ipAddress) {
+                            printerDataStore.removePrinter(target)
                         }
-                        showEditPrinterDialog = false
+                        printerDataStore.addOrUpdatePrinter(
+                            Printer(
+                                name = printerName,
+                                ipAddress = ipAddress,
+                                accessCode = accessCode
+                            )
+                        )
                         editPrinterTarget.value = null
-                    },
-                    onDismiss = {
-                        showEditPrinterDialog = false
-                        editPrinterTarget.value = null
-                    },
-                    editMode = true,
-                    initialName = target.name,
-                    initialIpAddress = target.ipAddress,
-                    initialAccessCode = target.accessCode,
-                )
-            }
+                    }
+                },
+                onDismiss = {
+                    editPrinterTarget.value = null
+                },
+                initialName = target.name,
+                initialIpAddress = target.ipAddress,
+                initialAccessCode = target.accessCode,
+            )
         }
 
-        if (showRemovePrinterDialog) {
+        if (removePrinterTarget.value != null) {
             RemovePrinterDialog(
                 printer = removePrinterTarget.value,
                 onConfirm = {
@@ -203,10 +167,9 @@ fun PrinterListScreen(previewPrinters: List<Printer> = emptyList()) {
                         printerDataStore.removePrinter(removePrinterTarget.value)
                         removePrinterTarget.value = null
                     }
-                    showRemovePrinterDialog = false
                 },
                 onDismiss = {
-                    showRemovePrinterDialog = false
+                    removePrinterTarget.value = null
                 },
             )
         }
@@ -217,8 +180,6 @@ fun PrinterListScreen(previewPrinters: List<Printer> = emptyList()) {
 @Composable
 private fun PrinterListScreenPreview() {
     OpenHandTheme {
-        PrinterListScreen(
-            previewPrinters = PREVIEW_PRINTERS
-        )
+        PrinterListScreen()
     }
 }

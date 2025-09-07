@@ -7,12 +7,13 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
-import com.virtualmememachine.openhand.data.PREVIEW_PRINTERS
+import com.virtualmememachine.openhand.data.PREVIEW_PRINTER
 import com.virtualmememachine.openhand.data.Printer
 import com.virtualmememachine.openhand.ui.theme.OpenHandTheme
 
 /**
  * Dialog for removing a printer
+ * @param printer Printer that we are prompting to delete
  * @param onConfirm Callback invoked when the user taps 'Confirm'
  * @param onDismiss Callback invoked when the user cancels or dismisses the dialog
  */
@@ -50,7 +51,7 @@ fun RemovePrinterDialog(
 private fun AddPrinterDialogPreview() {
     OpenHandTheme {
         RemovePrinterDialog(
-            printer = PREVIEW_PRINTERS.first(),
+            printer = PREVIEW_PRINTER,
             onConfirm = {},
             onDismiss = {},
         )
