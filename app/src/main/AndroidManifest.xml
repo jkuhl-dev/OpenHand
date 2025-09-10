@@ -14,7 +14,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.OpenHand">
         <activity
-            android:name=".MainActivity"
+            android:name="com.jkuhldev.openhand.MainActivity"
             android:exported="true"
             android:theme="@style/Theme.OpenHand">
             <intent-filter>

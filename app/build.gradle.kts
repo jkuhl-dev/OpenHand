@@ -8,11 +8,11 @@ plugins {
 }
 
 android {
-    namespace = "com.virtualmememachine.openhand"
+    namespace = "com.jkuhldev.openhand"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.virtualmememachine.openhand"
+        applicationId = "com.jkuhldev.openhand"
         minSdk = 29
         targetSdk = 36
         versionCode = 1
