@@ -1,30 +1,20 @@
 package com.virtualmememachine.openhand.ui.card.status
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccessTimeFilled
 import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import com.virtualmememachine.openhand.data.ConnectionState
 import com.virtualmememachine.openhand.data.PREVIEW_PRINTER
 import com.virtualmememachine.openhand.data.PREVIEW_PRINTER_STATUS
 import com.virtualmememachine.openhand.data.Printer
 import com.virtualmememachine.openhand.data.PrinterStatus
+import com.virtualmememachine.openhand.ui.card.OpenHandCard
 import com.virtualmememachine.openhand.ui.theme.OpenHandTheme
 
 /**
@@ -35,48 +25,40 @@ import com.virtualmememachine.openhand.ui.theme.OpenHandTheme
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ConnectionCard(printer: Printer, status: PrinterStatus) {
-    Card(
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
-        modifier = Modifier.fillMaxWidth()
+    OpenHandCard(
+        title = "Connection",
+        indicator = {
+            Icon(
+                imageVector = when (status.connectionState) {
+                    ConnectionState.CONNECTING -> {
+                        Icons.Default.AccessTimeFilled
+                    }
+
+                    ConnectionState.SUCCESS -> {
+                        Icons.Default.CheckCircle
+                    }
+
+                    ConnectionState.ERROR -> {
+                        Icons.Default.Cancel
+                    }
+                },
+                contentDescription = "Connection Indicator",
+            )
+        }
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
-            ) {
-                Text(text = "Connection", fontWeight = FontWeight.Bold)
-                Icon(
-                    imageVector = when (status.connectionState) {
-                        ConnectionState.CONNECTING -> {
-                            Icons.Default.AccessTimeFilled
-                        }
-
-                        ConnectionState.SUCCESS -> {
-                            Icons.Default.CheckCircle
-                        }
-
-                        ConnectionState.ERROR -> {
-                            Icons.Default.Cancel
-                        }
-                    },
-                    contentDescription = "Connection Indicator",
-                )
+        when (status.connectionState) {
+            ConnectionState.CONNECTING -> {
+                Text(text = "Connecting...")
             }
-            when (status.connectionState) {
-                ConnectionState.CONNECTING -> {
-                    Text(text = "Connecting...")
-                }
 
-                ConnectionState.SUCCESS -> {
-                    Text(text = "IP Address: ${printer.ipAddress}")
-                    Text(text = "Last Updated: ${getLastUpdatedString(status.lastUpdatedMillis)}")
-                    Text(text = "Printer Serial: ${status.printerSerial ?: "N/A"}")
-                }
+            ConnectionState.SUCCESS -> {
+                Text(text = "IP Address: ${printer.ipAddress}")
+                Text(text = "Last Updated: ${getLastUpdatedString(status.lastUpdatedMillis)}")
+                Text(text = "Printer Serial: ${status.printerSerial ?: "N/A"}")
+            }
 
-                ConnectionState.ERROR -> {
-                    Text(text = "Error: ${status.error}")
-                }
+            ConnectionState.ERROR -> {
+                Text(text = "Error: ${status.error}")
             }
         }
     }
@@ -93,7 +75,7 @@ private fun getLastUpdatedString(lastUpdatedMillis: Long?): String {
     return "%.2f seconds ago".format(diffMs / 1000f)
 }
 
-@Preview(showBackground = true)
+@PreviewLightDark
 @Composable
 private fun ConnectionCardPreview() {
     OpenHandTheme {

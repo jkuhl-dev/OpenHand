@@ -15,7 +15,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import com.virtualmememachine.openhand.ui.theme.OpenHandTheme
 
@@ -99,7 +99,7 @@ fun AddPrinterDialog(
     )
 }
 
-@Preview(showBackground = true)
+@PreviewLightDark()
 @Composable
 private fun AddPrinterDialogPreview() {
     OpenHandTheme {

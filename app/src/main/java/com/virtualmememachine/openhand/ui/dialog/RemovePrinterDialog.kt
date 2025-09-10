@@ -6,7 +6,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import com.virtualmememachine.openhand.data.PREVIEW_PRINTER
 import com.virtualmememachine.openhand.data.Printer
 import com.virtualmememachine.openhand.ui.theme.OpenHandTheme
@@ -46,7 +46,7 @@ fun RemovePrinterDialog(
     )
 }
 
-@Preview(showBackground = true)
+@PreviewLightDark()
 @Composable
 private fun AddPrinterDialogPreview() {
     OpenHandTheme {

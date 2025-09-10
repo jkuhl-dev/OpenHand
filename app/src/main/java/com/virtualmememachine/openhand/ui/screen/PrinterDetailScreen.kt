@@ -26,8 +26,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import com.virtualmememachine.openhand.data.NavigationBarItemData
 import com.virtualmememachine.openhand.data.PREVIEW_PRINTER
 import com.virtualmememachine.openhand.data.Printer
@@ -88,7 +87,6 @@ fun PrinterDetailScreen(printer: Printer, startTab: Int = 0, onBack: () -> Unit 
         Column(
             modifier = Modifier
                 .padding(innerPadding)
-                .padding(16.dp)
                 .fillMaxSize(),
             verticalArrangement = Arrangement.Top
         ) {
@@ -101,7 +99,7 @@ fun PrinterDetailScreen(printer: Printer, startTab: Int = 0, onBack: () -> Unit 
     }
 }
 
-@Preview(showBackground = true)
+@PreviewLightDark()
 @Composable
 private fun PrinterDetailPreview() {
     OpenHandTheme {

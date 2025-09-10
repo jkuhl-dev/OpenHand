@@ -1,8 +1,12 @@
 package com.virtualmememachine.openhand.ui.tab
 
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.PreviewLightDark
+import androidx.compose.ui.unit.dp
 import com.virtualmememachine.openhand.data.PREVIEW_PRINTER
 import com.virtualmememachine.openhand.data.Printer
 import com.virtualmememachine.openhand.ui.card.ComingSoonCard
@@ -16,10 +20,12 @@ import com.virtualmememachine.openhand.ui.theme.OpenHandTheme
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LiveViewTab(printer: Printer) {
+    Spacer(modifier = Modifier.size(8.dp))
+
     ComingSoonCard()
 }
 
-@Preview(showBackground = true)
+@PreviewLightDark()
 @Composable
 private fun LiveViewTabPreview() {
     OpenHandTheme {
