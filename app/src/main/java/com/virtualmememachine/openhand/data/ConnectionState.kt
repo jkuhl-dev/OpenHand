@@ -5,6 +5,6 @@ package com.virtualmememachine.openhand.data
  */
 enum class ConnectionState {
     CONNECTING,
-    SUCCESS,
-    ERROR
+    ERROR,
+    SUCCESS
 }

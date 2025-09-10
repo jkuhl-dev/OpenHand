@@ -30,35 +30,21 @@ fun ConnectionCard(printer: Printer, status: PrinterStatus) {
         indicator = {
             Icon(
                 imageVector = when (status.connectionState) {
-                    ConnectionState.CONNECTING -> {
-                        Icons.Default.AccessTimeFilled
-                    }
-
-                    ConnectionState.SUCCESS -> {
-                        Icons.Default.CheckCircle
-                    }
-
-                    ConnectionState.ERROR -> {
-                        Icons.Default.Cancel
-                    }
+                    ConnectionState.CONNECTING -> Icons.Default.AccessTimeFilled
+                    ConnectionState.ERROR -> Icons.Default.Cancel
+                    ConnectionState.SUCCESS -> Icons.Default.CheckCircle
                 },
                 contentDescription = "Connection Indicator",
             )
         }
     ) {
         when (status.connectionState) {
-            ConnectionState.CONNECTING -> {
-                Text(text = "Connecting...")
-            }
-
+            ConnectionState.CONNECTING -> Text(text = "Connecting...")
+            ConnectionState.ERROR -> Text(text = "Error: ${status.error}")
             ConnectionState.SUCCESS -> {
                 Text(text = "IP Address: ${printer.ipAddress}")
                 Text(text = "Last Updated: ${getLastUpdatedString(status.lastUpdatedMillis)}")
                 Text(text = "Printer Serial: ${status.printerSerial ?: "N/A"}")
-            }
-
-            ConnectionState.ERROR -> {
-                Text(text = "Error: ${status.error}")
             }
         }
     }
