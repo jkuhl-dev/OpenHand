@@ -1,15 +1,23 @@
+# Android Studio project files
 *.iml
+.idea
+
+# Project caches
+.kotlin
 .gradle
-/local.properties
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
-.DS_Store
-/build
-/captures
+build
+captures
+
+# NDK caches
 .externalNativeBuild
 .cxx
+
+# Local project settings
+/local.properties
 local.properties
+
+# macOS Finder caches
+.DS_Store
+
+# Project references
+references
