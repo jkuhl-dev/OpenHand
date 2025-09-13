@@ -7,7 +7,7 @@ custom firmware but should work on any Bambu Lab X1 series printer that has been
 
 **Other Bambu Lab printer models are not supported yet.**
 
-<img src="screenshots/add_printer.png" alt="Add Printer" width="240"/> <img src="screenshots/printer_list.png" alt="Printer List" width="240"/> <img src="screenshots/status_tab.png" alt="Status Tab" width="240"/>
+<img src="screenshots/add_printer.png" alt="Add Printer" width="240"/> <img src="screenshots/status_tab.png" alt="Status Tab" width="240"/> <img src="screenshots/live_view_tab.png" alt="Live View Tab" width="240"/>
 
 ## Features
 
