@@ -18,11 +18,7 @@ import org.eclipse.paho.client.mqttv3.IMqttToken
 import org.eclipse.paho.client.mqttv3.MqttCallbackExtended
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions
 import org.eclipse.paho.client.mqttv3.MqttMessage
-import java.security.SecureRandom
-import java.security.cert.X509Certificate
 import java.util.UUID
-import javax.net.ssl.SSLContext
-import javax.net.ssl.X509TrustManager
 
 /**
  * MQTT client for retrieving printer status data
@@ -91,18 +87,6 @@ class PrinterStatusClient(
             override fun deliveryComplete(token: IMqttDeliveryToken?) {}
         })
 
-        // Configure SSL to allow connections with unknown certificates
-        val sslContext = SSLContext.getInstance("TLS")
-        sslContext.init(
-            null,
-            arrayOf(object : X509TrustManager {
-                override fun getAcceptedIssuers(): Array<X509Certificate> = arrayOf()
-                override fun checkClientTrusted(chain: Array<X509Certificate>, authType: String) {}
-                override fun checkServerTrusted(chain: Array<X509Certificate>, authType: String) {}
-            }),
-            SecureRandom()
-        )
-
         // Attempt to connect to MQTT server
         client?.connect(
             options = MqttConnectOptions().apply {
@@ -111,7 +95,8 @@ class PrinterStatusClient(
                 userName = "bblp"
                 password = printer.accessCode.toCharArray()
                 connectionTimeout = 5
-                socketFactory = sslContext.socketFactory
+                isHttpsHostnameVerificationEnabled = false
+                socketFactory = createSocketFactory(context)
             },
             userContext = null,
             callback = object : IMqttActionListener {
