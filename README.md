@@ -12,12 +12,13 @@ custom firmware but should work on any Bambu Lab X1 series printer that has been
 ## Features
 
 - Printer status monitoring
+- Live view camera feed
 
 #### Coming Soon
 
-- Live view camera feed
 - File management
 - Release on F-Droid
+- P1 and A1 series support
 
 ## References
 
