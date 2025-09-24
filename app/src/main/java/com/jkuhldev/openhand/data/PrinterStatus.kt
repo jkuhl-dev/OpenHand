@@ -129,7 +129,10 @@ data class PrinterStatus(
                 outputList.add(
                     FilamentStatus(
                         id = id,
-                        color = parseColor(tray.optString("tray_color")),
+                        color = parseColor(
+                            tray.optString("tray_color")
+                                .takeIf { it != "00000000" } // 'Empty' color code
+                        ),
                         type = tray.optString("tray_type").takeIf { it.isNotBlank() }
                     )
                 )
