@@ -46,7 +46,9 @@ fun LiveViewTab(printer: Printer, isPreview: Boolean = LocalInspectionMode.curre
 
     Box(
         contentAlignment = Alignment.Center,
-        modifier = Modifier.fillMaxSize().aspectRatio(16f / 9f)
+        modifier = Modifier
+            .fillMaxSize()
+            .aspectRatio(16f / 9f)
     ) {
         if (isPreview) {
             Surface(
