@@ -2,9 +2,7 @@ package com.jkuhldev.openhand.network
 
 import android.util.Log
 import com.jkuhldev.openhand.data.Printer
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.apache.commons.net.ProtocolCommandEvent
 import org.apache.commons.net.ProtocolCommandListener
@@ -16,17 +14,22 @@ import org.bouncycastle.jsse.BCSSLSocket
 import org.bouncycastle.jsse.provider.BouncyCastleJsseProvider
 import java.net.Socket
 import java.security.SecureRandom
+import java.util.Locale
 import javax.net.ssl.SSLContext
-
-private const val TAG = "PrinterFilesClient"
 
 /**
  * FTPS client for managing files on a connected printer
- * @param scope Scope used for launching background operations
- * @param printer Printer we want the client to connect to
  */
-class PrinterFilesClient(private val scope: CoroutineScope, private val printer: Printer) {
+class PrinterFilesClient() {
     private var client: FTPSClientWithSessionReuse? = null
+
+    /**
+     * Gets the current directory and returns it
+     * @return String containing current directory
+     */
+    suspend fun getCurrentDirectory(): String = withContext(Dispatchers.IO) {
+        client?.printWorkingDirectory() ?: ""
+    }
 
     /**
      * Lists the contents of the current directory and returns it
@@ -39,13 +42,17 @@ class PrinterFilesClient(private val scope: CoroutineScope, private val printer:
         val files = c.listFiles()
         c.enterLocalActiveMode()
 
-        files.toList()
+        files.toList().sortedWith(
+            compareByDescending<FTPFile> { it.isDirectory }
+                .thenBy { it.name.lowercase(Locale.getDefault()) }
+        )
     }
 
     /**
      * Starts the client
+     * @param printer Printer we want the client to connect to
      */
-    suspend fun start() = withContext(Dispatchers.IO) {
+    suspend fun start(printer: Printer) = withContext(Dispatchers.IO) {
         if (client != null) return@withContext
 
         // Initialize FTPS client
@@ -67,6 +74,7 @@ class PrinterFilesClient(private val scope: CoroutineScope, private val printer:
         ftps.login("bblp", printer.accessCode)
 
         // Configure printer connection
+        // https://en.wikipedia.org/wiki/List_of_FTP_commands
         ftps.opts("UTF8", "ON")
         ftps.execPBSZ(0)
         ftps.execPROT("P")
@@ -82,11 +90,13 @@ class PrinterFilesClient(private val scope: CoroutineScope, private val printer:
         val c = client
         client = null
         if (c != null) {
-            scope.launch(Dispatchers.IO) {
-                runCatching { c.logout() }
-                runCatching { c.disconnect() }
-            }
+            runCatching { c.logout() }
+            runCatching { c.disconnect() }
         }
+    }
+
+    companion object {
+        private const val TAG = "PrinterFilesClient"
     }
 }
 
@@ -104,17 +114,15 @@ class FTPSClientWithSessionReuse() : FTPSClient(true, createSSLContext()) {
      */
     override fun _connectAction_() {
         super._connectAction_()
-        if (_socket_ is BCSSLSocket) {
-            sessionToResume = (_socket_ as BCSSLSocket).bcSession
-        }
+        sessionToResume = (_socket_ as? BCSSLSocket)?.bcSession ?: sessionToResume
     }
 
     /**
      * Intercept new sockets as they are created and set them to use the existing SSL session
      */
     override fun _prepareDataSocket_(socket: Socket?) {
-        if (socket is BCSSLSocket && sessionToResume != null) {
-            (socket as BCSSLSocket).setBCSessionToResume(sessionToResume)
+        if (sessionToResume != null) {
+            (socket as? BCSSLSocket)?.setBCSessionToResume(sessionToResume)
         }
     }
 
