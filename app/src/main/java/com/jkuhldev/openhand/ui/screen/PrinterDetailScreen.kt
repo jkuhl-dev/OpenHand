@@ -16,12 +16,15 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -44,6 +47,7 @@ import com.jkuhldev.openhand.ui.theme.OpenHandTheme
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PrinterDetailScreen(printer: Printer, startTab: Int = 0, onBack: () -> Unit = {}) {
+    val snackbarHostState = remember { SnackbarHostState() }
     var selectedTab by rememberSaveable { mutableIntStateOf(startTab) }
 
     Scaffold(
@@ -82,7 +86,8 @@ fun PrinterDetailScreen(printer: Printer, startTab: Int = 0, onBack: () -> Unit 
                     )
                 }
             }
-        }
+        },
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
     ) { innerPadding ->
         Column(
             modifier = Modifier
@@ -93,7 +98,7 @@ fun PrinterDetailScreen(printer: Printer, startTab: Int = 0, onBack: () -> Unit 
             when (selectedTab) {
                 0 -> StatusTab(printer = printer)
                 1 -> LiveViewTab(printer = printer)
-                2 -> FilesTab(printer = printer)
+                2 -> FilesTab(printer = printer, snackbarHostState = snackbarHostState)
             }
         }
     }

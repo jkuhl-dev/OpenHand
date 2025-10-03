@@ -1,5 +1,7 @@
 package com.jkuhldev.openhand.ui.tab
 
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -11,6 +13,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.InsertDriveFile
+import androidx.compose.material.icons.filled.DriveFolderUpload
 import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.CircularProgressIndicator
@@ -20,12 +23,16 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalInspectionMode
@@ -37,13 +44,17 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.jkuhldev.openhand.data.PREVIEW_PRINTER
 import com.jkuhldev.openhand.data.Printer
 import com.jkuhldev.openhand.ui.card.OpenHandCard
+import com.jkuhldev.openhand.ui.dialog.FileOptionsDialog
 import com.jkuhldev.openhand.ui.screen.PrinterDetailScreen
 import com.jkuhldev.openhand.ui.theme.OpenHandTheme
+import kotlinx.coroutines.launch
+import org.apache.commons.net.ftp.FTPFile
 import java.util.Locale
 
 /**
  * Tab for managing files stored on the printer
  * @param printer Printer that is being interacted with
+ * @param snackbarHostState SnackbarHostState used to display Snackbar notifications
  * @param viewModel ViewModel that yields state data for this tab
  * @param isPreview Boolean that denotes if the Composable is being rendered in a preview or not
  */
@@ -51,9 +62,13 @@ import java.util.Locale
 @Composable
 fun FilesTab(
     printer: Printer,
+    snackbarHostState: SnackbarHostState,
     viewModel: FilesTabViewModel = viewModel(),
     isPreview: Boolean = LocalInspectionMode.current
 ) {
+    val scope = rememberCoroutineScope()
+    val fileMenuTarget = remember { mutableStateOf<FTPFile?>(null) }
+
     val currentPath by viewModel.currentPath.collectAsStateWithLifecycle()
     val exception by viewModel.exception.collectAsStateWithLifecycle()
     val files by viewModel.files.collectAsStateWithLifecycle()
@@ -70,7 +85,7 @@ fun FilesTab(
             modifier = Modifier.height(50.dp)
         ) {
             Text(
-                text = if (isLoading) "Loading..." else currentPath,
+                text = currentPath,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier
@@ -108,6 +123,22 @@ fun FilesTab(
     }
 
     LazyColumn {
+        if (currentPath.isNotBlank() && currentPath != "/") {
+            item {
+                ListItem(
+                    headlineContent = { Text(text = "Previous Directory") },
+                    leadingContent = {
+                        Icon(
+                            imageVector = Icons.Default.DriveFolderUpload,
+                            contentDescription = "Previous Directory"
+                        )
+                    },
+                    modifier = Modifier.clickable(onClick = { viewModel.changeDirectory("..") })
+                )
+                HorizontalDivider()
+            }
+        }
+
         itemsIndexed(files) { index, file ->
             ListItem(
                 headlineContent = {
@@ -123,12 +154,34 @@ fun FilesTab(
                         contentDescription = file.name
                     )
                 },
-                trailingContent = { if (!file.isDirectory) Text(text = getFileSizeString(file.size)) },
+                trailingContent = { if (file.isFile) Text(text = getFileSizeString(file.size)) },
+                modifier = Modifier.combinedClickable(
+                    onClick = {
+                        if (file.isDirectory) {
+                            viewModel.changeDirectory("${currentPath}/${file.name}")
+                        }
+                    },
+                    onLongClick = { fileMenuTarget.value = file }
+                )
             )
-            if (index < files.size - 1) {
-                HorizontalDivider()
-            }
+            HorizontalDivider()
         }
+    }
+
+    if (fileMenuTarget.value != null) {
+        FileOptionsDialog(
+            targetFile = fileMenuTarget.value!!,
+            onDismiss = { fileMenuTarget.value = null },
+            onDownload = {
+                scope.launch { snackbarHostState.showSnackbar("Download Not Implemented") }
+            },
+            onRename = {
+                scope.launch { snackbarHostState.showSnackbar("Rename Not Implemented") }
+            },
+            onDelete = {
+                scope.launch { snackbarHostState.showSnackbar("Delete Not Implemented") }
+            }
+        )
     }
 }
 

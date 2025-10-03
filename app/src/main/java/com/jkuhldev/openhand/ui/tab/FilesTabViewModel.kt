@@ -40,6 +40,22 @@ class FilesTabViewModel(
     }
 
     /**
+     * Changes the current directory
+     * @param targetDirectory Path to the directory we want to change to
+     */
+    fun changeDirectory(targetDirectory: String) {
+        scope.launch {
+            _isLoading.value = true
+            runCatching { printerFilesClient.changeDirectory(targetDirectory) }
+                .onFailure { e ->
+                    _exception.value = e
+                    _isLoading.value = false
+                }
+                .onSuccess { refresh() }
+        }
+    }
+
+    /**
      * Refreshes the current path and file list states using data from the PrinterFilesClient
      */
     fun refresh() {
@@ -72,8 +88,8 @@ class FilesTabViewModel(
 
         scope.launch {
             runCatching { printerFilesClient.start(printer) }
-                .onFailure {
-                    e -> _exception.value = e
+                .onFailure { e ->
+                    _exception.value = e
                     _isLoading.value = false
                 }
                 .onSuccess { refresh() }

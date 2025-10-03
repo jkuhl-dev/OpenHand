@@ -24,6 +24,14 @@ class PrinterFilesClient() {
     private var client: FTPSClientWithSessionReuse? = null
 
     /**
+     * Changes the current directory
+     * @param targetDirectory Path to the directory we want to change to
+     */
+    suspend fun changeDirectory(targetDirectory: String) = withContext(Dispatchers.IO) {
+        client?.changeWorkingDirectory(targetDirectory)
+    }
+
+    /**
      * Gets the current directory and returns it
      * @return String containing current directory
      */
