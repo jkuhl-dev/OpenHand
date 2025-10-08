@@ -1,6 +1,7 @@
 package com.jkuhldev.openhand.ui.tab
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import com.jkuhldev.openhand.data.Printer
 import com.jkuhldev.openhand.network.PrinterFilesClient
 import kotlinx.coroutines.CoroutineScope
@@ -15,9 +16,11 @@ import org.apache.commons.net.ftp.FTPFile
 
 /**
  * ViewModel for FilesTab
+ * @property printer Printer associated with this ViewModel
  * @property scope Scope used for launching background operations
  */
 class FilesTabViewModel(
+    private val printer: Printer,
     private val scope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 ) : ViewModel() {
     private val _currentPath: MutableStateFlow<String> = MutableStateFlow("")
@@ -30,6 +33,24 @@ class FilesTabViewModel(
     val exception: StateFlow<Throwable?> = _exception.asStateFlow()
     val files: StateFlow<List<FTPFile>> = _files.asStateFlow()
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
+
+    /**
+     * Preview constructor
+     * @param printer Printer to be used in the preview ViewModel
+     * @param currentPath Current path to be used in the preview ViewModel
+     * @param files List of files to be used in the preview ViewModel
+     * @param isLoading Loading state to be used in the preview ViewModel
+     */
+    constructor(
+        printer: Printer,
+        currentPath: String,
+        files: List<FTPFile>,
+        isLoading: Boolean
+    ) : this(printer) {
+        _currentPath.value = currentPath
+        _files.value = files
+        _isLoading.value = isLoading
+    }
 
     /**
      * Lifecycle method called when the ViewModel's host closes
@@ -71,21 +92,8 @@ class FilesTabViewModel(
 
     /**
      * Starts the PrinterFilesClient managed by the ViewModel
-     * @param printer Printer that is being interacted with
-     * @param isPreview Boolean that denotes if the ViewModel should use preview data or not
      */
-    fun startClient(printer: Printer, isPreview: Boolean = false) {
-        if (isPreview) {
-            _currentPath.value = "/preview/directory"
-            _files.value = listOf(
-                FTPFile().apply { name = "Preview_File1.3mf" },
-                FTPFile().apply { name = "Preview_File2.zip" },
-                FTPFile().apply { name = "Preview_File3.mp4" }
-            )
-            _isLoading.value = false
-            return
-        }
-
+    fun startClient() {
         scope.launch {
             runCatching { printerFilesClient.start(printer) }
                 .onFailure { e ->
@@ -93,6 +101,20 @@ class FilesTabViewModel(
                     _isLoading.value = false
                 }
                 .onSuccess { refresh() }
+        }
+    }
+
+    /**
+     * Factory for creating FilesTabViewModel
+     * @param printer Printer associated with this ViewModel
+     */
+    class Factory(private val printer: Printer) : ViewModelProvider.Factory {
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            if (modelClass.isAssignableFrom(FilesTabViewModel::class.java)) {
+                @Suppress("UNCHECKED_CAST")
+                return FilesTabViewModel(printer) as T
+            }
+            throw IllegalArgumentException("Unknown ViewModel class")
         }
     }
 }

@@ -41,14 +41,18 @@ import com.jkuhldev.openhand.ui.theme.OpenHandTheme
 /**
  * Screen for interacting with a selected printer
  * @param printer Printer that is being interacted with
- * @param startTab Tab in the bottom NavigationBar that should be selected on startup
  * @param onBack Callback triggered when the back button is pressed
+ * @param previewContent Preview content to be displayed in the PrinterDetailScreen Scaffold
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PrinterDetailScreen(printer: Printer, startTab: Int = 0, onBack: () -> Unit = {}) {
+fun PrinterDetailScreen(
+    printer: Printer,
+    onBack: () -> Unit = {},
+    previewContent: @Composable (() -> Unit)? = null
+) {
     val snackbarHostState = remember { SnackbarHostState() }
-    var selectedTab by rememberSaveable { mutableIntStateOf(startTab) }
+    var selectedTab by rememberSaveable { mutableIntStateOf(0) }
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -95,6 +99,11 @@ fun PrinterDetailScreen(printer: Printer, startTab: Int = 0, onBack: () -> Unit 
                 .fillMaxSize(),
             verticalArrangement = Arrangement.Top
         ) {
+            if (previewContent != null) {
+                previewContent()
+                return@Scaffold
+            }
+
             when (selectedTab) {
                 0 -> StatusTab(printer = printer)
                 1 -> LiveViewTab(printer = printer)

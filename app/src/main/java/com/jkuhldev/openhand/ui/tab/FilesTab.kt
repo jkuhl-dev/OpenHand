@@ -1,5 +1,6 @@
 package com.jkuhldev.openhand.ui.tab
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
@@ -35,7 +36,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
@@ -56,15 +56,13 @@ import java.util.Locale
  * @param printer Printer that is being interacted with
  * @param snackbarHostState SnackbarHostState used to display Snackbar notifications
  * @param viewModel ViewModel that yields state data for this tab
- * @param isPreview Boolean that denotes if the Composable is being rendered in a preview or not
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FilesTab(
     printer: Printer,
     snackbarHostState: SnackbarHostState,
-    viewModel: FilesTabViewModel = viewModel(),
-    isPreview: Boolean = LocalInspectionMode.current
+    viewModel: FilesTabViewModel = viewModel(factory = FilesTabViewModel.Factory(printer)),
 ) {
     val scope = rememberCoroutineScope()
     val fileMenuTarget = remember { mutableStateOf<FTPFile?>(null) }
@@ -75,7 +73,7 @@ fun FilesTab(
     val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
 
     LaunchedEffect(viewModel, printer) {
-        viewModel.startClient(printer, isPreview)
+        viewModel.startClient()
     }
 
     Surface(color = MaterialTheme.colorScheme.surfaceContainerHigh) {
@@ -200,13 +198,29 @@ private fun getFileSizeString(fileSize: Long): String {
     return String.format(Locale.getDefault(), "%.1f GB", gb)
 }
 
+@SuppressLint("ViewModelConstructorInComposable")
 @PreviewLightDark()
 @Composable
 private fun FilesTabPreview() {
     OpenHandTheme {
         PrinterDetailScreen(
             printer = PREVIEW_PRINTER,
-            startTab = 2,
+            previewContent = {
+                FilesTab(
+                    printer = PREVIEW_PRINTER,
+                    snackbarHostState = SnackbarHostState(),
+                    viewModel = FilesTabViewModel(
+                        printer = PREVIEW_PRINTER,
+                        currentPath = "/preview/path",
+                        files = listOf(
+                            FTPFile().apply { name = "Preview File1.3mf" },
+                            FTPFile().apply { name = "Preview File2.zip" },
+                            FTPFile().apply { name = "Preview File3.mp4" }
+                        ),
+                        isLoading = false
+                    )
+                )
+            }
         )
     }
 }

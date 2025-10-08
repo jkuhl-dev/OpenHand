@@ -116,7 +116,12 @@ private fun LiveViewTabPreview() {
     OpenHandTheme {
         PrinterDetailScreen(
             printer = PREVIEW_PRINTER,
-            startTab = 1,
+            previewContent = {
+                LiveViewTab(
+                    printer = PREVIEW_PRINTER,
+                    isPreview = true
+                )
+            }
         )
     }
 }
