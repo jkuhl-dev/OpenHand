@@ -16,6 +16,8 @@ media3ExoplayerRtsp = "1.8.0"
 media3UiCompose = "1.8.0"
 pahoMqttAndroid = "4.4.1"
 navigationCompose = "2.9.4"
+commonsNet = "3.12.0"
+bctls = "1.82"
 
 [libraries]
 androidx-compose-animation = { module = "androidx.compose.animation:animation" }
@@ -41,6 +43,8 @@ androidx-datastore-preferences = { group = "androidx.datastore", name = "datasto
 androidx-material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended", version.ref = "materialIconsExtended" }
 paho-mqtt-android = { module = "com.github.hannesa2:paho.mqtt.android", version.ref = "pahoMqttAndroid" }
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
+commons-net = { module = "commons-net:commons-net", version.ref = "commonsNet" }
+bctls = { module = "org.bouncycastle:bctls-jdk18on", version.ref = "bctls" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

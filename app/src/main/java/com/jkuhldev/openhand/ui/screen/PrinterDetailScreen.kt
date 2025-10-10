@@ -16,12 +16,15 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -38,13 +41,18 @@ import com.jkuhldev.openhand.ui.theme.OpenHandTheme
 /**
  * Screen for interacting with a selected printer
  * @param printer Printer that is being interacted with
- * @param startTab Tab in the bottom NavigationBar that should be selected on startup
  * @param onBack Callback triggered when the back button is pressed
+ * @param previewContent Preview content to be displayed in the PrinterDetailScreen Scaffold
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PrinterDetailScreen(printer: Printer, startTab: Int = 0, onBack: () -> Unit = {}) {
-    var selectedTab by rememberSaveable { mutableIntStateOf(startTab) }
+fun PrinterDetailScreen(
+    printer: Printer,
+    onBack: () -> Unit = {},
+    previewContent: @Composable (() -> Unit)? = null
+) {
+    val snackbarHostState = remember { SnackbarHostState() }
+    var selectedTab by rememberSaveable { mutableIntStateOf(0) }
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -82,7 +90,8 @@ fun PrinterDetailScreen(printer: Printer, startTab: Int = 0, onBack: () -> Unit 
                     )
                 }
             }
-        }
+        },
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
     ) { innerPadding ->
         Column(
             modifier = Modifier
@@ -90,10 +99,15 @@ fun PrinterDetailScreen(printer: Printer, startTab: Int = 0, onBack: () -> Unit 
                 .fillMaxSize(),
             verticalArrangement = Arrangement.Top
         ) {
+            if (previewContent != null) {
+                previewContent()
+                return@Scaffold
+            }
+
             when (selectedTab) {
                 0 -> StatusTab(printer = printer)
                 1 -> LiveViewTab(printer = printer)
-                2 -> FilesTab(printer = printer)
+                2 -> FilesTab(printer = printer, snackbarHostState = snackbarHostState)
             }
         }
     }

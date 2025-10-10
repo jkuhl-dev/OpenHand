@@ -74,7 +74,12 @@ private fun StatusTabPreview() {
     OpenHandTheme {
         PrinterDetailScreen(
             printer = PREVIEW_PRINTER,
-            startTab = 0,
+            previewContent = {
+                StatusTab(
+                    printer = PREVIEW_PRINTER,
+                    isPreview = true
+                )
+            }
         )
     }
 }
